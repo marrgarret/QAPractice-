@@ -1,8 +1,6 @@
-package org.example.editreview;
+package org.example.login;
 
 import org.example.ConfProperties;
-import org.example.findplace.FindPlacePage;
-import org.example.login.LoginPage;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -12,29 +10,33 @@ import org.openqa.selenium.chrome.ChromeDriver;
 
 import java.util.concurrent.TimeUnit;
 
-public class EditTest {
-
-    public static EditPage editPage;
+public class LoginTest {
     public static LoginPage loginPage;
+    public static ProfilePage profilePage;
 
-    public static WebDriver driver = new ChromeDriver();
+    public static WebDriver driver;
 
-    @BeforeClass
+    @BeforeClass()
     public static void setup() {
         // определние пути до драйвера и его настройка
         System.setProperty("webdriver.chrome.driver", "c:\\webdrivers\\chromedriver.exe");
         // создание экземпляра драйвера
         driver = new ChromeDriver();
-        editPage = new EditPage(driver);
+        loginPage = new LoginPage(driver);
+        profilePage = new ProfilePage(driver);
         // окно разворачивается на полный экран
         driver.manage().window().maximize();
         // задержка на выполнение теста 10 секунд
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        // получение ссылки на страницу входа из файла настроек
         driver.get(ConfProperties.getProperty("loginpage"));
     }
 
     @Test
-    public void FindTest() {
+    public void loginTest() {
+        //значение login/password берутся из файла настроек по аналогии с chromedriver
+        //и loginpage
+
         // вводим логин
         loginPage.inputLogin(ConfProperties.getProperty("login"));
         // нажимаем кнопку входа
@@ -43,23 +45,16 @@ public class EditTest {
         loginPage.inputPasswd(ConfProperties.getProperty("password"));
         // нажимаем кнопку входа
         loginPage.clickLoginBtn();
-
-        // нажать на троеточия для выпадения списка
-        editPage.dotsBtn();
-        // нажать на изменить отзыв в выпадающем окне
-        editPage.editBtn();
-        // поменять отзыв
-        editPage.inputReview(ConfProperties.getProperty("review"));
-        // нажать сохранить
-        editPage.save();
-        // проверить совпадения ожидаемого и результата
-        String review = editPage.getReview();
-        Assert.assertEquals(ConfProperties.getProperty("review"), review);
+        // получаем отображаемый логин
+        String user = profilePage.getUserName();
+        // и сравниваем его с логином из файла настроек
+        Assert.assertEquals(ConfProperties.getProperty("login"), user);
     }
 
     @AfterClass
     public static void tearDown() {
+        profilePage.entryMenu();
+        profilePage.userLogout();
         driver.quit();
     }
-
 }

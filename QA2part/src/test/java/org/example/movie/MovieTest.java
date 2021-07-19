@@ -1,5 +1,7 @@
 package org.example.movie;
 
+import org.example.ConfProperties;
+import org.example.login.LoginPage;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -11,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 
 public class MovieTest {
 
+    public static LoginPage loginPage;
     public static MoviePage moviePage;
 
     public static WebDriver driver = new ChromeDriver();
@@ -26,11 +29,20 @@ public class MovieTest {
         driver.manage().window().maximize();
         // задержка на выполнение теста 10 секунд
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-        driver.get("https://reviews.yandex.ru/ugcpub/cabinet?main_tab=professions");
+        driver.get(ConfProperties.getProperty("loginpage"));
     }
 
     @Test
     public void movieTest() {
+        // вводим логин
+        loginPage.inputLogin(ConfProperties.getProperty("login"));
+        // нажимаем кнопку входа
+        loginPage.clickLoginBtn();
+        // вводим пароль
+        loginPage.inputPasswd(ConfProperties.getProperty("password"));
+        // нажимаем кнопку входа
+        loginPage.clickLoginBtn();
+
         //нажимаем на звездочки для получения оценки
         moviePage.rateMovie();
         // нажимаем кнопку отправить
